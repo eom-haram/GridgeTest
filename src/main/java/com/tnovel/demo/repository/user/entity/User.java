@@ -1,6 +1,7 @@
 package com.tnovel.demo.repository.user.entity;
 
 import com.tnovel.demo.repository.DataStatus;
+import com.tnovel.demo.repository.post.entity.Post;
 import com.tnovel.demo.repository.user.entity.vo.SignupType;
 import com.tnovel.demo.repository.user.entity.vo.UserStatus;
 import jakarta.persistence.*;
@@ -37,11 +38,14 @@ public class User implements UserDetails {
     private UserStatus userStatus;
     private DataStatus dataStatus;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "followingUser")
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "followedUser")
     private List<Following> usersOneFollow;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "followedUser")
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "followingUser")
     private List<Following> usersWhoFollowOne;
+
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "user")
+    private List<Post> posts;
 
     @Transient
     private List<SimpleGrantedAuthority> authorities;
@@ -63,6 +67,7 @@ public class User implements UserDetails {
                 SignupType.NATIVE,
                 UserStatus.SIGNED_UP,
                 DataStatus.ACTIVATED,
+                Collections.emptyList(),
                 Collections.emptyList(),
                 Collections.emptyList(),
                 SIMPLE_ROLES

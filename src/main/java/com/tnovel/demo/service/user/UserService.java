@@ -1,12 +1,11 @@
 package com.tnovel.demo.service.user;
 
 import com.tnovel.demo.controller.user.dto.UserCreateRequestDto;
-import com.tnovel.demo.controller.user.dto.PasswordResetDto;
-import com.tnovel.demo.controller.user.dto.PasswordResetRequestDto;
 import com.tnovel.demo.controller.user.dto.UserResponseDto;
 import com.tnovel.demo.exception.CustomException;
 import com.tnovel.demo.exception.ExceptionType;
 import com.tnovel.demo.repository.user.UserRepository;
+import com.tnovel.demo.repository.user.entity.Following;
 import com.tnovel.demo.repository.user.entity.User;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +28,13 @@ public class UserService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new CustomException(ExceptionType.USER_NOT_EXIST));
+    }
+
+    public List<User> getFollowingUsers(String username) {
+        User loggedUser = (User) this.loadUserByUsername(username);
+        return loggedUser.getUsersOneFollow().stream()
+                .map(Following::getFollowedUser)
+                .toList();
     }
 
     @Transactional

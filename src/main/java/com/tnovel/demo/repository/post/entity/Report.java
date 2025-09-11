@@ -1,5 +1,7 @@
 package com.tnovel.demo.repository.post.entity;
 
+import com.tnovel.demo.repository.post.entity.vo.ReportCategory;
+import com.tnovel.demo.repository.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -10,22 +12,27 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Image {
+public class Report {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
     private Post post;
 
-    private String imageUrl;
+    private ReportCategory reportCategory;
 
-    protected static Image create(Post post, String imageUrl) {
-        return new Image(
+    public static Report create(User user, Post post, ReportCategory reportCategory) {
+        return new Report(
                 null,
+                user,
                 post,
-                imageUrl
+                reportCategory
         );
     }
 }
