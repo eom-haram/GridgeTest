@@ -32,7 +32,7 @@ public class UserResponseDto {
                 entity.getPhNum(),
                 entity.getBirthdate(),
                 entity.getCreatedAt(),
-                entity.getSingnupType(),
+                entity.getSignupType(),
                 entity.getUserStatus(),
                 entity.getDataStatus()
         );
