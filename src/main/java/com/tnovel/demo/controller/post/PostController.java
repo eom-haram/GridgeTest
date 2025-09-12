@@ -19,7 +19,7 @@ public class PostController {
     private final PostService postService;
 
     @GetMapping("/{postId}")
-    public ResponseEntity<PostResponseDto> findById(@PathVariable @Min(value = 1) Integer postId) {
+    public ResponseEntity<PostResponseDto> findById(@PathVariable @Min(1) Integer postId) {
         PostResponseDto post = postService.findById(postId);
         return ResponseEntity.ok(post);
     }
@@ -31,8 +31,20 @@ public class PostController {
     }
 
     @DeleteMapping("/{postId}")
-    public ResponseEntity<Void> delete(@PathVariable Integer postId, @AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<Void> delete(@PathVariable @Min(1) Integer postId, @AuthenticationPrincipal UserDetails userDetails) {
         postService.delete(postId, userDetails.getUsername());
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @DeleteMapping("/{postId}/comments/{commentId}")
+    public ResponseEntity<Void> deleteComment(@PathVariable @Min(1) Integer postId, @PathVariable @Min(1) Integer commentId, @AuthenticationPrincipal UserDetails userDetails) {
+        postService.deleteComment(postId, commentId, userDetails.getUsername());
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @DeleteMapping("/{postId}/likes/{likeId}")
+    public ResponseEntity<Void> deleteLike(@PathVariable @Min(1) Integer postId, @PathVariable @Min(1) Integer likeId, @AuthenticationPrincipal UserDetails userDetails) {
+        postService.deleteLike(postId, likeId, userDetails.getUsername());
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

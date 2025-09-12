@@ -53,4 +53,11 @@ public class UserService implements UserDetailsService {
 
         return UserResponseDto.of(saved);
     }
+
+    @Transactional
+    public User internalFindById(Integer id) {
+        return userRepository.findById(id)
+                .filter(User::isActivated)
+                .orElseThrow(() -> new CustomException(ExceptionType.USER_NOT_EXIST));
+    }
 }

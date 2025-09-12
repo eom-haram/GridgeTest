@@ -30,7 +30,7 @@ public class PostResponseDto {
                 entity.getLikes().stream().map(LikeResponseDto::from).toList(),
                 entity.getComments().stream().map(CommentResponseDto::from).toList(),
                 entity.getCreatedAt(),
-                entity.getModifiedAt()
+                entity.getUpdatedAt()
         );
     }
 }

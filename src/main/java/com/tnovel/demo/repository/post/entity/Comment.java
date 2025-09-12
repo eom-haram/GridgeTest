@@ -30,7 +30,7 @@ public class Comment {
     private String content;
 
     private LocalDateTime createdAt;
-    private LocalDateTime modifiedAt;
+    private LocalDateTime updatedAt;
 
     private DataStatus dataStatus;
 
@@ -46,13 +46,17 @@ public class Comment {
         );
     }
 
-    protected void modify(String content) {
+    public void update(String content) {
         this.content = content;
-        this.modifiedAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
     }
 
     protected void delete() {
         this.dataStatus = DataStatus.DELETED;
+    }
+
+    public boolean isActivated() {
+        return this.dataStatus.equals(DataStatus.ACTIVATED);
     }
 
     public boolean isCommentOwner(User user) {

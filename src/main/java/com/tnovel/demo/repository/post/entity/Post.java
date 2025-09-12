@@ -5,10 +5,7 @@ import com.tnovel.demo.exception.ExceptionType;
 import com.tnovel.demo.repository.DataStatus;
 import com.tnovel.demo.repository.user.entity.User;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -40,7 +37,7 @@ public class Post {
     private List<Comment> comments;
 
     private LocalDateTime createdAt;
-    private LocalDateTime modifiedAt;
+    private LocalDateTime updatedAt;
 
     private DataStatus dataStatus;
 
@@ -66,6 +63,10 @@ public class Post {
         return this.user.equals(user);
     }
 
+    public boolean isActivated() {
+        return this.dataStatus.equals(DataStatus.ACTIVATED);
+    }
+
     public Post addImages(List<String> imageUrls) {
         for (String url:imageUrls) {
             this.images.add(Image.create(this, url));
@@ -74,46 +75,32 @@ public class Post {
         return this;
     }
 
-    public void addLike(User user) {
+    public Like addLike(User user) {
         if (this.likes.isEmpty()) {
             this.likes = new ArrayList<>();
         }
-        this.likes.add(Like.create(user, this));
+        Like like = Like.create(user, this);
+        this.likes.add(like);
+
+        return like;
     }
 
-    public void deleteLike(Integer likeId) {
-        Like like = this.likes.stream()
-                .filter(l -> l.getId().equals(likeId))
-                .filter(l -> l.getDataStatus().equals(DataStatus.ACTIVATED))
-                .findFirst()
-                .orElseThrow(() -> new CustomException(ExceptionType.LIKE_NOT_EXIST));
-
+    public void deleteLike(Like like) {
         like.delete();
         this.likes.remove(like);
     }
 
-    public void addComment(User user, String content) {
+    public Comment addComment(User user, String content) {
         if (this.comments.isEmpty()) {
             this.comments = new ArrayList<>();
         }
-        this.comments.add(Comment.create(user, this, content));
+        Comment comment = Comment.create(user, this, content);
+        this.comments.add(comment);
+        return comment;
     }
 
-    public void modifyComment(Integer commentId, String content) {
-        Comment comment = this.findCommentById(commentId);
-        comment.modify(content);
-    }
-
-    public void deleteComment(Integer commentId) {
-        Comment comment = this.findCommentById(commentId);
+    public void deleteComment(Comment comment) {
         comment.delete();
-    }
-
-    private Comment findCommentById(Integer commentId) {
-        return this.comments.stream()
-                .filter(c -> c.getId().equals(commentId))
-                .filter(c -> c.getDataStatus().equals(DataStatus.ACTIVATED))
-                .findFirst()
-                .orElseThrow(() -> new CustomException(ExceptionType.COMMENT_NOT_EXIST));
+        this.comments.remove(comment);
     }
 }

@@ -78,6 +78,10 @@ public class User implements UserDetails {
         this.password = password;
     }
 
+    public boolean isActivated() {
+        return this.dataStatus.equals(DataStatus.ACTIVATED);
+    }
+
     public void followUser(User targetUser) {
         Following newFollowing = Following.create(this, targetUser);
 

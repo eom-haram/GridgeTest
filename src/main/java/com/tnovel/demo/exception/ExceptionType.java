@@ -15,7 +15,10 @@ public enum ExceptionType {
     POST_NOT_EXIST(HttpStatus.NOT_FOUND, "해당 게시글이 존재하지 않습니다."),
     LIKE_NOT_EXIST(HttpStatus.NOT_FOUND, "해당 좋아요가 존재하지 않습니다."),
     COMMENT_NOT_EXIST(HttpStatus.NOT_FOUND, "해당 댓글이 존재하지 않습니다."),
-    POST_NOT_YOURS(HttpStatus.BAD_REQUEST, "해당 게시글에 대한 권한이 없습니다.");
+    POST_NOT_YOURS(HttpStatus.BAD_REQUEST, "해당 게시글에 대한 권한이 없습니다."),
+    COMMENT_NOT_YOURS(HttpStatus.BAD_REQUEST, "해당 댓글에 대한 권한이 없습니다."),
+    LIKE_NOT_YOURS(HttpStatus.BAD_REQUEST, "해당 좋아요에 대한 권한이 없습니다."),
+    BAD_REQUEST(HttpStatus.BAD_REQUEST, "잘못된 접근입니다.");
 
     private final HttpStatus status;
     private final String message;

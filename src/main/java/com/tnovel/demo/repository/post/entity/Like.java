@@ -48,4 +48,8 @@ public class Like {
     public boolean isLikeOwner(User user) {
         return this.user.equals(user);
     }
+
+    public boolean isActivated() {
+        return this.dataStatus.equals(DataStatus.ACTIVATED);
+    }
 }
