@@ -15,7 +15,7 @@ public class CommentResponseDto {
     private UserSimpleResponseDto user;
     private String content;
     private LocalDateTime createdAt;
-    private LocalDateTime modifiedAt;
+    private LocalDateTime updatedAt;
 
     public static CommentResponseDto from(Comment entity) {
         return new CommentResponseDto(
@@ -23,7 +23,7 @@ public class CommentResponseDto {
                 UserSimpleResponseDto.from(entity.getUser()),
                 entity.getContent(),
                 entity.getCreatedAt(),
-                entity.getModifiedAt()
+                entity.getUpdatedAt()
         );
     }
 }

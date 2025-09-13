@@ -6,8 +6,6 @@ import com.tnovel.demo.service.post.LikeService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,9 +15,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class LikeController {
     private final LikeService likeService;
-    @PostMapping
-    public ResponseEntity<LikeResponseDto> create(@Valid LikeCreateRequestDto request, @AuthenticationPrincipal UserDetails userDetails) {
-        LikeResponseDto like = likeService.create(request, userDetails.getUsername());
+
+    @PostMapping("")
+    public ResponseEntity<LikeResponseDto> create(@Valid LikeCreateRequestDto request) {
+        LikeResponseDto like = likeService.create(request);
         return ResponseEntity.ok(like);
     }
 }

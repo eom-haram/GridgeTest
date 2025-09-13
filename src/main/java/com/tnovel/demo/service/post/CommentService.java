@@ -8,7 +8,6 @@ import com.tnovel.demo.exception.ExceptionType;
 import com.tnovel.demo.repository.post.CommentRepository;
 import com.tnovel.demo.repository.post.entity.Comment;
 import com.tnovel.demo.repository.post.entity.Post;
-import com.tnovel.demo.repository.user.entity.User;
 import com.tnovel.demo.service.user.UserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -22,18 +21,15 @@ public class CommentService {
     private final CommentRepository commentRepository;
 
     @Transactional
-    public CommentResponseDto create(CommentCreateRequestDto request, String username) {
+    public CommentResponseDto create(CommentCreateRequestDto request) {
         Post post = postService.internalFindById(request.getPostId());
-        Comment comment = post.addComment((User) userService.loadUserByUsername(username), request.getContent());
+        Comment comment = post.addComment(userService.getLoggedUser(), request.getContent());
         return CommentResponseDto.from(comment);
     }
 
     @Transactional
-    public CommentResponseDto update(CommentUpdateRequestDto request, String username) {
+    public CommentResponseDto update(CommentUpdateRequestDto request) {
         Comment comment = this.internalFindById(request.getId());
-        if (!comment.isCommentOwner((User) userService.loadUserByUsername(username))) {
-            throw new CustomException(ExceptionType.COMMENT_NOT_YOURS);
-        }
         comment.update(request.getContent());
         Comment saved = commentRepository.save(comment);
         return CommentResponseDto.from(saved);
@@ -44,5 +40,10 @@ public class CommentService {
         return commentRepository.findById(id)
                 .filter(Comment::isActivated)
                 .orElseThrow(() -> new CustomException(ExceptionType.COMMENT_NOT_EXIST));
+    }
+
+    @Transactional
+    public boolean isCommentOwner(Integer commentId) {
+        return this.internalFindById(commentId).getUser().equals(userService.getLoggedUser());
     }
 }

@@ -58,8 +58,4 @@ public class Comment {
     public boolean isActivated() {
         return this.dataStatus.equals(DataStatus.ACTIVATED);
     }
-
-    public boolean isCommentOwner(User user) {
-        return this.user.equals(user);
-    }
 }

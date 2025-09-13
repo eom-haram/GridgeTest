@@ -4,5 +4,5 @@ public enum UserStatus {
     SIGNED_UP,
     DORMANT,
     LEFT,
-    BANNED;
+    BANNED
 }

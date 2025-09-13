@@ -7,6 +7,7 @@ import com.tnovel.demo.exception.ExceptionType;
 import com.tnovel.demo.repository.user.UserRepository;
 import com.tnovel.demo.repository.user.entity.Following;
 import com.tnovel.demo.repository.user.entity.User;
+import com.tnovel.demo.security.SecurityUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -27,13 +28,14 @@ public class UserService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userRepository.findByUsername(username)
+                .filter(User::isActivated)
                 .orElseThrow(() -> new CustomException(ExceptionType.USER_NOT_EXIST));
     }
 
     public List<User> getFollowingUsers(String username) {
-        User loggedUser = (User) this.loadUserByUsername(username);
-        return loggedUser.getUsersOneFollow().stream()
+        return this.getLoggedUser().getUsersOneFollow().stream()
                 .map(Following::getFollowedUser)
+                .filter(User::isActivated)
                 .toList();
     }
 
@@ -59,5 +61,9 @@ public class UserService implements UserDetailsService {
         return userRepository.findById(id)
                 .filter(User::isActivated)
                 .orElseThrow(() -> new CustomException(ExceptionType.USER_NOT_EXIST));
+    }
+
+    public User getLoggedUser() {
+        return (User) this.loadUserByUsername(SecurityUtil.getCurrentUsername());
     }
 }

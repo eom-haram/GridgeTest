@@ -1,7 +1,5 @@
 package com.tnovel.demo.repository.post.entity;
 
-import com.tnovel.demo.exception.CustomException;
-import com.tnovel.demo.exception.ExceptionType;
 import com.tnovel.demo.repository.DataStatus;
 import com.tnovel.demo.repository.user.entity.User;
 import jakarta.persistence.*;
@@ -57,10 +55,6 @@ public class Post {
 
     public void delete() {
         this.dataStatus = DataStatus.DELETED;
-    }
-
-    public boolean isPostOwner(User user) {
-        return this.user.equals(user);
     }
 
     public boolean isActivated() {

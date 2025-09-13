@@ -19,7 +19,7 @@ public class PostResponseDto {
     private List<LikeResponseDto> likes;
     private List<CommentResponseDto> comments;
     private LocalDateTime createdAt;
-    private LocalDateTime modifiedAt;
+    private LocalDateTime updatedAt;
 
     public static PostResponseDto from(Post entity) {
         return new PostResponseDto(
