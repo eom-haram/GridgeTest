@@ -20,7 +20,8 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Make Firebase Config File
-        run: echo '${{ secrets.FIREBASE_PRIVATE_KEY_JSON }}' > src/main/resources/tnovel-firebase-adminsdk.json
+        run: |
+    echo "${{ secrets.FIREBASE_PRIVATE_KEY_JSON }}" | base64 --decode > src/main/resources/tnovel-firebase-adminsdk.json
 
       - name: Spring Boot Build
         run: ./gradlew clean build
