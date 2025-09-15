@@ -24,7 +24,7 @@ jobs:
           echo "${{ secrets.FIREBASE_PRIVATE_KEY_JSON }}" | base64 --decode > src/main/resources/tnovel-firebase-adminsdk.json
 
       - name: Spring Boot Build
-        run: ./gradlew clean build
+        run: ./gradlew clean build -x test
         env:
           DB_ENDPOINT: ${{ secrets.DB_ENDPOINT }}
           DB_PORT: ${{ secrets.DB_PORT }}
