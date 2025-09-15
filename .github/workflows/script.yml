@@ -19,11 +19,28 @@ jobs:
       - name: Run chmod to make gradlew executable
         run: chmod +x ./gradlew
 
+      - name: Make Firebase Config File
+        run: echo '${{ secrets.FIREBASE_PRIVATE_KEY_JSON }}' > src/main/resources/tnovel-firebase-adminsdk.json
+
       - name: Spring Boot Build
         run: ./gradlew clean build
+        env:
+          DB_ENDPOINT: ${{ secrets.DB_ENDPOINT }}
+          DB_PORT: ${{ secrets.DB_PORT }}
+          DB_NAME: ${{ secrets.DB_NAME }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PW: ${{ secrets.DB_PW }}
+          MAIL_ADDRESS: ${{ secrets.MAIL_ADDRESS }}
+          MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          KAKAO_CLIENT_ID: ${{ secrets.KAKAO_CLIENT_ID }}
+          KAKAO_CLIENT_SECRET: ${{ secrets.KAKAO_CLIENT_SECRET }}
+          KAKAO_REDIRECT_URI: ${{ secrets.KAKAO_REDIRECT_URI }}
+          FIREBASE_BUCKET: ${{ secrets.FIREBASE_BUCKET }}
+          SWAGGER_SERVER_URL: ${{ secrets.SWAGGER_SERVER_URL }}
 
       - name: docker image build
-        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/github-actions-demo .
+        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/gridgetest-tnovel .
 
       - name: docker login
         uses: docker/login-action@v2
@@ -32,4 +49,4 @@ jobs:
           password: ${{ secrets.DOCKERHUB_PW }}
 
       - name: docker Hub push
-        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/github-actions-demo
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/gridgetest-tnovel
