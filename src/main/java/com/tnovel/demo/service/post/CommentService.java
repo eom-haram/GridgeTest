@@ -5,12 +5,17 @@ import com.tnovel.demo.controller.post.dto.CommentResponseDto;
 import com.tnovel.demo.controller.post.dto.CommentUpdateRequestDto;
 import com.tnovel.demo.exception.CustomException;
 import com.tnovel.demo.exception.ExceptionType;
+import com.tnovel.demo.repository.DataStatus;
 import com.tnovel.demo.repository.post.CommentRepository;
 import com.tnovel.demo.repository.post.entity.Comment;
 import com.tnovel.demo.repository.post.entity.Post;
 import com.tnovel.demo.service.user.UserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -37,8 +42,7 @@ public class CommentService {
 
     @Transactional
     protected Comment internalFindById(Integer id) {
-        return commentRepository.findById(id)
-                .filter(Comment::isActivated)
+        return commentRepository.findByIdAndDataStatus(id, DataStatus.ACTIVATED)
                 .orElseThrow(() -> new CustomException(ExceptionType.COMMENT_NOT_EXIST));
     }
 

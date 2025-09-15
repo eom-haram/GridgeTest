@@ -8,7 +8,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
+import java.time.Instant;
 
 @Entity
 @Getter
@@ -27,7 +28,7 @@ public class Like {
     @JoinColumn(name = "post_id")
     private Post post;
 
-    private LocalDateTime createdAt;
+    private Timestamp createdAt;
 
     private DataStatus dataStatus;
 
@@ -36,7 +37,7 @@ public class Like {
                 null,
                 user,
                 post,
-                LocalDateTime.now(),
+                Timestamp.from(Instant.now()),
                 DataStatus.ACTIVATED
         );
     }

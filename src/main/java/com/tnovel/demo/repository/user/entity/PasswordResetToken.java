@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -23,18 +25,18 @@ public class PasswordResetToken {
     private User user;
 
     private String token;
-    private LocalDateTime expiresAt;
+    private Timestamp expiresAt;
 
     public static PasswordResetToken generate(User user) {
         return new PasswordResetToken(
                 null,
                 user,
                 UUID.randomUUID().toString(),
-                LocalDateTime.now().plusHours(1)
+                Timestamp.valueOf(LocalDateTime.now().plusHours(1))
         );
     }
 
     public boolean isExpired() {
-        return expiresAt.isBefore(LocalDateTime.now());
+        return expiresAt.before(Timestamp.from(Instant.now()));
     }
 }

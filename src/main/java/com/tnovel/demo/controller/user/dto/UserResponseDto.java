@@ -8,8 +8,8 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.sql.Timestamp;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -19,12 +19,14 @@ public class UserResponseDto {
     private String name;
     private String phNum;
     private LocalDate birthdate;
-    private LocalDateTime createdAt;
+    private Timestamp createdAt;
     private SignupType singnupType;
+    private boolean privacyConsentStatus;
+    private Timestamp privacyConsentDate;
     private UserStatus userStatus;
     private DataStatus dataStatus;
 
-    public static UserResponseDto of(User entity) {
+    public static UserResponseDto from(User entity) {
         return new UserResponseDto(
                 entity.getId(),
                 entity.getUsername(),
@@ -33,6 +35,8 @@ public class UserResponseDto {
                 entity.getBirthdate(),
                 entity.getCreatedAt(),
                 entity.getSignupType(),
+                entity.donePrivacyConsent(),
+                entity.getPrivacyConsentDate(),
                 entity.getUserStatus(),
                 entity.getDataStatus()
         );

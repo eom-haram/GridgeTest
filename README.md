@@ -1,4 +1,28 @@
-![Gridge Test ERD.png](../../../../../Downloads/Gridge%20Test.png)
+![ERD-EHR.png](src/main/resources/static/ERD-EHR.png)
+본 프로젝트는 2025년 9월 진행된 그릿지테스트 응시용입니다.  
+ERD에 색으로 표기된 바와 같이 user와 post, 두 개의 root로 작업했습니다.
 
-현재 Token-based Authentication, OAuth2를 제외한 User Map 구현은 끝났고, 게시판 Map Entity를 구현하고 있습니다.
-JWT 관련해서 이해가 늦어져서 개발이 늦어졌습니다만 오늘 내에 게시판 Map은 다 구현할 예정입니다.
+### /config
+여러가지 설정 파일들입니다.
++ Email
++ Firebase
++ PasswordEncoder
++ QueryDsl
++ Security
++ Swagger
+
+### /controller
+Controller Layer입니다.  
+
+### /exception
+커스텀 예외 처리 클래스들입니다.
+
+### /repository
+DataManager Layer입니다.
+JPA 사용을 위한 @Entity 클래스들도 위치해 있습니다.
+
+### /security
+인증 인가 관련 클래스들입니다.
+
+### /service
+Service Layer입니다.

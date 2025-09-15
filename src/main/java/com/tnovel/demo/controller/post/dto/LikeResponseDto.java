@@ -6,14 +6,14 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
 
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class LikeResponseDto {
     private Integer id;
     private UserSimpleResponseDto user;
-    private LocalDateTime createdAt;
+    private Timestamp createdAt;
 
     public static LikeResponseDto from(Like entity) {
         return new LikeResponseDto(

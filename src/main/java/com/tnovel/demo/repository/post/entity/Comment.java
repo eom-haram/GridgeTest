@@ -8,7 +8,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
+import java.time.Instant;
 
 @Entity
 @Getter
@@ -29,8 +30,8 @@ public class Comment {
 
     private String content;
 
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private Timestamp createdAt;
+    private Timestamp updatedAt;
 
     private DataStatus dataStatus;
 
@@ -40,15 +41,15 @@ public class Comment {
                 user,
                 post,
                 content,
-                LocalDateTime.now(),
-                LocalDateTime.now(),
+                Timestamp.from(Instant.now()),
+                Timestamp.from(Instant.now()),
                 DataStatus.ACTIVATED
         );
     }
 
     public void update(String content) {
         this.content = content;
-        this.updatedAt = LocalDateTime.now();
+        this.updatedAt = Timestamp.from(Instant.now());
     }
 
     protected void delete() {

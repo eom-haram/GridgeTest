@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum ReportCategory {
+public enum PostReportCategory {
     SPAM("스팸"),
     PROVOCATIVE("나체 이미지 또는 성적 행위"),
     HATRED("혐오 발언 또는 상징"),

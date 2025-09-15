@@ -8,10 +8,9 @@ import com.tnovel.demo.repository.user.PasswordResetTokenRepository;
 import com.tnovel.demo.repository.user.UserRepository;
 import com.tnovel.demo.repository.user.entity.PasswordResetToken;
 import com.tnovel.demo.repository.user.entity.User;
+import com.tnovel.demo.service.EmailService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +20,7 @@ public class PasswordResetService {
     private final UserRepository userRepository;
     private final PasswordResetTokenRepository tokenRepository;
     private final PasswordEncoder passwordEncoder;
-    private final JavaMailSender mailSender;
+    private final EmailService emailService;
 
     @Transactional
     public void processResetRequest(PasswordResetRequestDto request) {
@@ -31,7 +30,11 @@ public class PasswordResetService {
         PasswordResetToken token = PasswordResetToken.generate(user);
         PasswordResetToken saved = tokenRepository.save(token);
 
-        sendEmail(user.getEmail(), saved.getToken());
+        String resetUrl = "https://www.tnovel.com/reset-password?token=" + saved.getToken();
+        String content = "아래 링크를 클릭해 비밀번호를 재설정하세요.\n" + resetUrl;
+        String subject = "비밀번호 재설정";
+
+        emailService.sendEmail(user.getEmail(), subject, content);
     }
 
     @Transactional
@@ -54,17 +57,5 @@ public class PasswordResetService {
         user.resetPassword(passwordEncoder.encode(request.getPassword()));
 
         tokenRepository.delete(token);
-    }
-
-    private void sendEmail(String email, String token) {
-        String resetUrl = "https://www.tnovel.com/reset-password?token=" + token;
-        String body = "아래 링크를 클릭해 비밀번호를 재설정하세요.\n" + resetUrl;
-
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(email);
-        message.setSubject("비밀번호 재설정");
-        message.setText(body);
-
-        mailSender.send(message);
     }
 }

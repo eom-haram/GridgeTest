@@ -1,11 +1,16 @@
 package com.tnovel.demo.repository.post.entity;
 
 import com.tnovel.demo.repository.DataStatus;
+import com.tnovel.demo.repository.post.entity.vo.PostStatus;
 import com.tnovel.demo.repository.user.entity.User;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -16,7 +21,7 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Post {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -34,9 +39,11 @@ public class Post {
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "post")
     private List<Comment> comments;
 
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private Timestamp createdAt;
+    private Timestamp updatedAt;
 
+    private PostStatus postStatus;
+    private Integer reportNum;
     private DataStatus dataStatus;
 
     public static Post create(User user, String content) {
@@ -47,26 +54,28 @@ public class Post {
                 content,
                 Collections.emptyList(),
                 Collections.emptyList(),
-                LocalDateTime.now(),
-                LocalDateTime.now(),
+                Timestamp.from(Instant.now()),
+                Timestamp.from(Instant.now()),
+                PostStatus.VISIBLE,
+                0,
                 DataStatus.ACTIVATED
         );
     }
 
     public void delete() {
         this.dataStatus = DataStatus.DELETED;
+        for (Comment comment : this.comments) {
+            deleteComment(comment);
+        }
+        for (Like like : this.likes) {
+            deleteLike(like);
+        }
     }
 
-    public boolean isActivated() {
-        return this.dataStatus.equals(DataStatus.ACTIVATED);
-    }
-
-    public Post addImages(List<String> imageUrls) {
+    public void addImages(List<String> imageUrls) {
         for (String url:imageUrls) {
             this.images.add(Image.create(this, url));
         }
-
-        return this;
     }
 
     public Like addLike(User user) {
@@ -75,7 +84,6 @@ public class Post {
         }
         Like like = Like.create(user, this);
         this.likes.add(like);
-
         return like;
     }
 
@@ -96,5 +104,13 @@ public class Post {
     public void deleteComment(Comment comment) {
         comment.delete();
         this.comments.remove(comment);
+    }
+
+    public void addReports() {
+        this.reportNum++;
+    }
+
+    public void goingUnderExamination() {
+        this.postStatus = PostStatus.INVISIBLE;
     }
 }

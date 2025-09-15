@@ -17,6 +17,8 @@ public class UsernamePasswordAuthenticationProvider implements AuthenticationPro
     private final UserDetailsService userDetailsService;
     private final PasswordEncoder passwordEncoder;
 
+    private static String PW_EXP_MSG = "잘못된 비밀번호입니다. 다시 확인하세요";
+
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) authentication;
@@ -25,7 +27,7 @@ public class UsernamePasswordAuthenticationProvider implements AuthenticationPro
 
         User loggedUser = (User) userDetailsService.loadUserByUsername(username);
         if (!passwordEncoder.matches(password, loggedUser.getPassword())) {
-            throw new BadCredentialsException(loggedUser.getUsername() + ": Invalid password");
+            throw new BadCredentialsException(PW_EXP_MSG);
         }
 
         return new UsernamePasswordAuthenticationToken(username, password, loggedUser.getAuthorities());

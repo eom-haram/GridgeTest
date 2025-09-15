@@ -1,6 +1,6 @@
 package com.tnovel.demo.repository.post.entity;
 
-import com.tnovel.demo.repository.post.entity.vo.ReportCategory;
+import com.tnovel.demo.repository.post.entity.vo.PostReportCategory;
 import com.tnovel.demo.repository.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Report {
+public class PostReport {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -25,10 +25,10 @@ public class Report {
     @JoinColumn(name = "post_id")
     private Post post;
 
-    private ReportCategory reportCategory;
+    private PostReportCategory reportCategory;
 
-    public static Report create(User user, Post post, ReportCategory reportCategory) {
-        return new Report(
+    public static PostReport create(User user, Post post, PostReportCategory reportCategory) {
+        return new PostReport(
                 null,
                 user,
                 post,

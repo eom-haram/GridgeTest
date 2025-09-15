@@ -26,7 +26,7 @@ public class PasswordResetController {
         return ResponseEntity.ok("토큰의 유효성이 확인되었습니다.");
     }
 
-    @PutMapping("/password/reset")
+    @PutMapping("/process")
     public ResponseEntity<String> passwordReset(@RequestBody @Valid PasswordResetDto request) {
         resetService.resetPassword(request);
         return ResponseEntity.ok("비밀번호가 재설정되었습니다.");

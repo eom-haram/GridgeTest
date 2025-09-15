@@ -1,9 +1,12 @@
 package com.tnovel.demo.service.post;
 
+import com.tnovel.demo.controller.post.dto.CommentResponseDto;
+import com.tnovel.demo.controller.post.dto.PostCreateRequestDto;
 import com.tnovel.demo.controller.post.dto.PostResponseDto;
 import com.tnovel.demo.exception.CustomException;
 import com.tnovel.demo.exception.ExceptionType;
 import com.tnovel.demo.repository.DataStatus;
+import com.tnovel.demo.repository.post.CommentRepository;
 import com.tnovel.demo.repository.post.PostRepository;
 import com.tnovel.demo.repository.post.entity.Comment;
 import com.tnovel.demo.repository.post.entity.Like;
@@ -17,42 +20,48 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.io.IOException;
 
 @Service
 @RequiredArgsConstructor
 public class PostService {
     private final PostRepository postRepository;
+    private final CommentRepository commentRepository;
+
     private final UserService userService;
-    private static final Integer PAGESIZE = 10;
+    private final ImageService imageService;
+
+    private static Integer PAGESIZE = 10;
 
     @Transactional
     public PostResponseDto findById(Integer id) {
-        Post post = postRepository.findById(id)
-                .filter(Post::isActivated)
+        Post post =  postRepository.findByIdWithLikes(id)
                 .orElseThrow(() -> new CustomException(ExceptionType.POST_NOT_EXIST));
         return PostResponseDto.from(post);
     }
 
     @Transactional
-    public List<PostResponseDto> findAll(String username) {
-        return postRepository.findAll().stream()
-                .filter(p -> userService.getFollowingUsers(username).contains(p.getUser()))
-                .filter(Post::isActivated)
-                .map(PostResponseDto::from)
-                .toList();
+    public Page<CommentResponseDto> findComments(Integer postId, Integer pageIndex, Integer size) {
+        Post post = this.internalFindById(postId);
+        if (!size.equals(PAGESIZE) || pageIndex != (postRepository.CountCommentsByPostId(postId) % 10 + 1)) {
+            throw new CustomException(ExceptionType.WRONG_PAGE_INDEX);
+        }
+        Pageable pageable = PageRequest.of(pageIndex, size, Sort.by("createdAt").descending());
+        return commentRepository.findByDataStatusAndPost(DataStatus.ACTIVATED, post, pageable)
+                .map(CommentResponseDto::from);
     }
 
     @Transactional
-    public Page<PostResponseDto> findAll(Integer page) {
-        Pageable pageable = PageRequest.of(page, PAGESIZE, Sort.by("createdAt").descending());
-        return postRepository.findByDataStatus(DataStatus.ACTIVATED, pageable)
-                .map(PostResponseDto::from);
+    public PostResponseDto create(PostCreateRequestDto request) throws IOException {
+        Post post = Post.create(userService.getLoggedUser(), request.getContent());
+        post.addImages(imageService.uploadImages(request.getImages()));
+        Post saved = postRepository.save(post);
+        return PostResponseDto.from(saved);
     }
 
     @Transactional
     public void delete(Integer id) {
-        Post post =  this.internalFindById(id);
+        Post post = this.internalFindById(id);
         post.delete();
         postRepository.save(post);
     }
@@ -61,9 +70,9 @@ public class PostService {
     public void deleteComment(Integer postId, Integer commentId) {
         Post post = this.internalFindById(postId);
         Comment comment = post.getComments().stream()
-                        .filter(c -> c.getId().equals(commentId))
-                        .filter(Comment::isActivated).findFirst()
-                        .orElseThrow(() -> new CustomException(ExceptionType.COMMENT_NOT_EXIST));
+                .filter(c -> c.getId().equals(commentId))
+                .filter(Comment::isActivated).findFirst()
+                .orElseThrow(() -> new CustomException(ExceptionType.COMMENT_NOT_EXIST));
         post.deleteComment(comment);
         postRepository.save(post);
     }
@@ -81,13 +90,7 @@ public class PostService {
 
     @Transactional
     protected Post internalFindById(Integer id) {
-        return postRepository.findById(id)
-                .filter(Post::isActivated)
+        return postRepository.findByIdAndDataStatus(id, DataStatus.ACTIVATED)
                 .orElseThrow(() -> new CustomException(ExceptionType.POST_NOT_EXIST));
-    }
-
-    @Transactional
-    public boolean isPostOwner(Integer postId) {
-        return this.internalFindById(postId).getUser().equals(userService.getLoggedUser());
     }
 }
