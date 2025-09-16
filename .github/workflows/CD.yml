@@ -1,0 +1,74 @@
+name: CD to EC2
+
+on:
+  workflow_run:
+    workflows: ["Java CI with Gradle"]
+    types:
+      - completed
+
+jobs:
+  deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: get GitHub IP
+        id: ip
+        uses: haythem/public-ip@v1.2
+
+      - name: AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
+
+      - name: Add GitHub IP to AWS
+        run: |
+          aws ec2 authorize-security-group-ingress --group-id ${{ secrets.AWS_SG_ID }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
+
+      - name: Make .env file
+        run: |
+          cat <<EOF > .env
+          DB_ENDPOINT=${{ secrets.DB_ENDPOINT }}
+          DB_NAME=${{ secrets.DB_NAME }}
+          DB_PORT=${{ secrets.DB_PORT }}
+          DB_PW=${{ secrets.DB_PW }}
+          DB_USER=${{ secrets.DB_USER }}
+          FIREBASE_BUCKET=${{ secrets.FIREBASE_BUCKET }}
+          FIREBASE_PRIVATE_KEY_JSON=${{ secrets.FIREBASE_PRIVATE_KEY_JSON }}
+          JWT_SECRET=${{ secrets.JWT_SECRET }}
+          KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }}
+          KAKAO_CLIENT_SECRET=${{ secrets.KAKAO_CLIENT_SECRET }}
+          KAKAO_REDIRECT_URI=${{ secrets.KAKAO_REDIRECT_URI }}
+          MAIL_ADDRESS=${{ secrets.MAIL_ADDRESS }}
+          MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}
+          SWAGGER_SERVER_URL=${{ secrets.SWAGGER_SERVER_URL }}
+          EOF
+
+      - name: Copy .env to EC2
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.SSH_PEM_KEY }}
+          port: ${{ secrets.EC2_SSH_PORT }}
+          source: "./.env"
+          target: "/home/ubuntu"
+          
+      - name: AWS EC2 Connection
+        uses: appleboy/ssh-action@v0.1.6
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC22_USERNAME }}
+          key: ${{ secrets.SSH_PEM_KEY}} 
+          port: ${{ secrets.EC2_SSH_PORT }}
+          timeout: 60s
+          script: |
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/gridgetest-tnovel
+            sudo docker stop gridgetest_tnovel || true
+            sudo docker rm gridgetest_tnovel || true
+            sudo docker run -d -p 8080:8080 --name gridgetest-tnovel --env-file /home/ubuntu/.env ${{ secrets.DOCKERHUB_USERNAME }}/gridgetest-tnovel
+      - name: Github IP FROM security group
+        run: |
+          aws ec2 revoke-security-group-ingress --group-id ${{ secrets.AWS_SG_ID }} --protocol tcp --port 22 --cidr ${{ secrets.ip.outputs.ipv4}}/32
+        
