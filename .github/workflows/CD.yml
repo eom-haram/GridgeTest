@@ -55,11 +55,15 @@ jobs:
           source: "./.env"
           target: "/home/ec2-user"
 
-      - name: docker login
-        uses: docker/login-action@v2
+      - name: AWS EC2 Connection
+        uses: appleboy/ssh-action@v0.1.6
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_PW }}
+          script: |
+            echo "${{ secrets.DOCKERHUB_PW }}" | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/gridgetest-tnovel
+            sudo docker stop gridgetest-tnovel || true
+            sudo docker rm gridgetest-tnovel || true
+            sudo docker run -d ...
           
       - name: AWS EC2 Connection
         uses: appleboy/ssh-action@v0.1.6
