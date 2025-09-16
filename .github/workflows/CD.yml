@@ -55,21 +55,16 @@ jobs:
           source: "./.env"
           target: "/home/ec2-user"
 
-      - name: Docker Login
+      - name: Deploy to EC2
         uses: appleboy/ssh-action@v0.1.6
         with:
-          script: |
-            echo "${{ secrets.DOCKERHUB_PW }}" | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
-          
-      - name: AWS EC2 Connection
-        uses: appleboy/ssh-action@v0.1.6
-        with:
-          host: ${{ secrets.EC2_HOST }}
+          host: ${{ secrets.EC2_HOST }} 
           username: ${{ secrets.EC2_USERNAME }}
-          key: ${{ secrets.SSH_PEM_KEY}} 
+          key: ${{ secrets.SSH_PEM_KEY }}
           port: ${{ secrets.EC2_SSH_PORT }}
           timeout: 60s
           script: |
+            echo "${{ secrets.DOCKERHUB_PW }}" | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/gridgetest-tnovel
             sudo docker stop gridgetest_tnovel || true
             sudo docker rm gridgetest_tnovel || true
