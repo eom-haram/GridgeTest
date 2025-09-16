@@ -54,6 +54,12 @@ jobs:
           port: ${{ secrets.EC2_SSH_PORT }}
           source: "./.env"
           target: "/home/ec2-user"
+
+      - name: docker login
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PW }}
           
       - name: AWS EC2 Connection
         uses: appleboy/ssh-action@v0.1.6
@@ -68,6 +74,7 @@ jobs:
             sudo docker stop gridgetest_tnovel || true
             sudo docker rm gridgetest_tnovel || true
             sudo docker run -d -p 8080:8080 --name gridgetest-tnovel --env-file /home/ec2-user/.env ${{ secrets.DOCKERHUB_USERNAME }}/gridgetest-tnovel
+      
       - name: Github IP FROM security group
         run: |
           aws ec2 revoke-security-group-ingress --group-id ${{ secrets.AWS_SG_ID }} --protocol tcp --port 22 --cidr ${{ secrets.ip.outputs.ipv4}}/32
