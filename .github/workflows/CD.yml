@@ -64,8 +64,8 @@ jobs:
           port: ${{ secrets.EC2_SSH_PORT }}
           timeout: 60s
           script: |
-            echo "${{ secrets.DOCKERHUB_PW }}" | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
-            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/gridgetest-tnovel
+            sudo docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PW }}
+            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/gridgetest-tnovel
             sudo docker stop gridgetest_tnovel || true
             sudo docker rm gridgetest_tnovel || true
             sudo docker run -d -p 8080:8080 --name gridgetest-tnovel --env-file /home/ec2-user/.env ${{ secrets.DOCKERHUB_USERNAME }}/gridgetest-tnovel
