@@ -66,8 +66,8 @@ jobs:
           script: |
             sudo docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PW }}
             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/gridgetest-tnovel
-            sudo docker stop gridgetest_tnovel || true
-            sudo docker rm gridgetest_tnovel || true
+            sudo docker stop gridgetest-tnovel || true
+            sudo docker rm gridgetest-tnovel || true
             sudo docker run -d -p 8080:8080 --name gridgetest-tnovel --env-file /home/ec2-user/.env ${{ secrets.DOCKERHUB_USERNAME }}/gridgetest-tnovel
       
       - name: Github IP FROM security group
