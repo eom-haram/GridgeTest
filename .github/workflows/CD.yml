@@ -55,7 +55,7 @@ jobs:
           source: "./.env"
           target: "/home/ec2-user"
 
-      - name: AWS EC2 Connection
+      - name: Docker Login
         uses: appleboy/ssh-action@v0.1.6
         with:
           script: |
