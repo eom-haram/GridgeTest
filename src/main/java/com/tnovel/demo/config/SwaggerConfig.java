@@ -15,7 +15,7 @@ import java.util.Arrays;
 
 @Configuration
 public class SwaggerConfig {
-    @Value("$springdoc.swagger-ui.config-url")
+    @Value("${springdoc.swagger-ui.config-url}")
     private String url;
 
     @Bean
